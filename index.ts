@@ -32,6 +32,13 @@ program.argument('<project-directory>').action((dirName) => (projectPath = dirNa
  * main
  */
 async function run(): Promise<void> {
+  const resolvedProjectPath = await resolveProjectPath();
+  checkProjectName(resolvedProjectPath);
+  await checkProjectFoleder(resolvedProjectPath);
+  await createApp(resolvedProjectPath);
+}
+
+async function resolveProjectPath(): Promise<string> {
   if (typeof projectPath === 'string') {
     projectPath = projectPath.trim();
   }
@@ -68,6 +75,10 @@ async function run(): Promise<void> {
   }
 
   const resolvedProjectPath = path.resolve(projectPath);
+  return resolvedProjectPath;
+}
+
+function checkProjectName(resolvedProjectPath: string) {
   const projectName = path.basename(resolvedProjectPath);
 
   const { valid, problems } = validateNpmName(projectName);
@@ -81,18 +92,19 @@ async function run(): Promise<void> {
     problems!.forEach((p) => console.error(`    ${chalk.red.bold('*')} ${p}`));
     process.exit(1);
   }
+}
 
-  const root = path.resolve(resolvedProjectPath);
-
-  if (!(await isWriteable(path.dirname(root)))) {
+async function checkProjectFoleder(resolvedProjectPath: string) {
+  if (!(await isWriteable(path.dirname(resolvedProjectPath)))) {
     console.error(
       'The application path is not writable, please check folder permissions and try again.'
     );
     console.error('It is likely you do not have write permissions for this folder.');
     process.exit(1);
   }
+}
 
-  const packageManager = getPkgManager();
+async function createApp(root: string) {
   const appName = path.basename(root);
 
   await makeDir(root);
@@ -100,14 +112,15 @@ async function run(): Promise<void> {
     process.exit(1);
   }
 
-  const useYarn = packageManager === 'yarn';
-  const isOnline = !useYarn || (await getOnline());
+  writePackageJson(root, appName);
+  await installDep(root);
+}
 
-  console.log(chalk.bold(`Using ${packageManager}.`));
+function writePackageJson(root: string, appName: string) {
   /**
    * Create a package.json for the new project.
    */
-  const packageJsonWrite = {
+  const json = {
     name: appName,
     version: '0.1.0',
     private: true,
@@ -125,9 +138,16 @@ async function run(): Promise<void> {
   const splitedPath = root.split(path.sep); // there is a bug at root string or path.join
   fs.writeFileSync(
     path.join(splitedPath.join(path.sep), 'package.json'),
-    JSON.stringify(packageJsonWrite, null, 2) + os.EOL
+    JSON.stringify(json, null, 2) + os.EOL
   );
+}
 
+async function installDep(root: string) {
+  const packageManager = getPkgManager();
+  console.log(chalk.bold(`Using ${packageManager}.`));
+
+  const useYarn = packageManager === 'yarn';
+  const isOnline = !useYarn || (await getOnline());
   /**
    * These flags will be passed to `install()`.
    */

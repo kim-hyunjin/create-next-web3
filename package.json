@@ -1,9 +1,9 @@
 {
-  "name": "web3-nextjs-template",
+  "name": "create-next-web3",
   "version": "0.0.1",
   "description": "nextjs + typescript + prettier config + wagmi",
   "bin": {
-    "create-web3-nextjs-tempalate": "./dist/index.js"
+    "create-next-web3": "./dist/index.js"
   },
   "files": [
     "dist"
