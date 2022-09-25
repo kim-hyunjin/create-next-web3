@@ -13,6 +13,8 @@ import validateProjectName from 'validate-npm-package-name';
 import { Command } from 'commander';
 import spawn from 'cross-spawn';
 import checkForUpdate from 'update-check';
+import cpy from 'cpy';
+import rimraf from 'rimraf';
 
 import packageJson from './package.json';
 
@@ -111,9 +113,20 @@ async function createApp(root: string) {
   if (!isFolderEmpty(root, appName)) {
     process.exit(1);
   }
+  const originalDirectory = process.cwd();
+
+  process.chdir(root);
 
   writePackageJson(root, appName);
   await installDep(root);
+  await copyTemplate(root);
+
+  if (tryGitInit(root)) {
+    console.log('Initialized a git repository.');
+    console.log();
+  }
+
+  consoleDesc(root, originalDirectory, appName);
 }
 
 function writePackageJson(root: string, appName: string) {
@@ -129,17 +142,15 @@ function writePackageJson(root: string, appName: string) {
       build: 'next build',
       start: 'next start',
       lint: 'next lint',
+      // postinstall: 'yarn run typechain',
+      typechain: 'typechain --out-dir abi/types --target=ethers-v5 "abi/*.json"',
     },
   };
 
   /**
    * Write it to disk.
    */
-  const splitedPath = root.split(path.sep); // there is a bug at root string or path.join
-  fs.writeFileSync(
-    path.join(splitedPath.join(path.sep), 'package.json'),
-    JSON.stringify(json, null, 2) + os.EOL
-  );
+  fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify(json, null, 2) + os.EOL);
 }
 
 async function installDep(root: string) {
@@ -155,17 +166,21 @@ async function installDep(root: string) {
   /**
    * Default dependencies.
    */
-  const dependencies = ['react', 'react-dom', 'next'];
+  const dependencies = ['react', 'react-dom', 'next', 'ethers', 'wagmi'];
   /**
    * Default devDependencies.
    */
   const devDependencies = [
-    'eslint',
-    'eslint-config-next',
-    'typescript',
     '@types/react',
     '@types/node',
     '@types/react-dom',
+    'eslint',
+    'eslint-config-next',
+    'typescript',
+    'prettier',
+    '@trivago/prettier-plugin-sort-imports',
+    'typechain',
+    '@typechain/ethers-v5',
   ];
 
   /**
@@ -194,6 +209,70 @@ async function installDep(root: string) {
 
     const devInstallFlags = { devDependencies: true, ...installFlags };
     await install(root, devDependencies, devInstallFlags);
+  }
+  console.log();
+}
+
+async function copyTemplate(root: string) {
+  /**
+   * Copy the template files to the target directory.
+   */
+  await cpy('**', root, {
+    parents: true,
+    cwd: path.join(__dirname, 'template'),
+    rename: (name) => {
+      switch (name) {
+        case 'gitignore':
+        case 'eslintrc.json':
+        case 'prettierrc.js': {
+          return '.'.concat(name);
+        }
+        // README.md is ignored by webpack-asset-relocator-loader used by ncc:
+        // https://github.com/vercel/webpack-asset-relocator-loader/blob/e9308683d47ff507253e37c9bcbb99474603192b/src/asset-relocator.js#L227
+        case 'README-template.md': {
+          return 'README.md';
+        }
+        default: {
+          return name;
+        }
+      }
+    },
+  });
+}
+
+function consoleDesc(root: string, originalDirectory: string, appName: string) {
+  const packageJsonPath = path.join(root, 'package.json');
+
+  let cdpath: string;
+  if (path.join(originalDirectory, appName) === root) {
+    cdpath = appName;
+  } else {
+    cdpath = root;
+  }
+
+  console.log(`${chalk.green('Success!')} Created ${appName} at ${root}`);
+
+  const packageManager = getPkgManager();
+  console.log(chalk.bold(`Using ${packageManager}.`));
+
+  const useYarn = packageManager === 'yarn';
+  const hasPackageJson = fs.existsSync(packageJsonPath);
+  if (hasPackageJson) {
+    console.log('Inside that directory, you can run several commands:');
+    console.log();
+    console.log(chalk.cyan(`  ${packageManager} ${useYarn ? '' : 'run '}dev`));
+    console.log('    Starts the development server.');
+    console.log();
+    console.log(chalk.cyan(`  ${packageManager} ${useYarn ? '' : 'run '}build`));
+    console.log('    Builds the app for production.');
+    console.log();
+    console.log(chalk.cyan(`  ${packageManager} start`));
+    console.log('    Runs the built app in production mode.');
+    console.log();
+    console.log('We suggest that you begin by typing:');
+    console.log();
+    console.log(chalk.cyan('  cd'), cdpath);
+    console.log(`  ${chalk.cyan(`${packageManager} ${useYarn ? '' : 'run '}dev`)}`);
   }
   console.log();
 }
@@ -458,6 +537,49 @@ async function notifyUpdate(): Promise<void> {
   } catch {
     // ignore error
   }
+}
+
+function tryGitInit(root: string): boolean {
+  let didInit = false;
+  try {
+    execSync('git --version', { stdio: 'ignore' });
+    if (isInGitRepository() || isInMercurialRepository()) {
+      return false;
+    }
+
+    execSync('git init', { stdio: 'ignore' });
+    didInit = true;
+
+    execSync('git checkout -b main', { stdio: 'ignore' });
+
+    execSync('git add -A', { stdio: 'ignore' });
+    execSync('git commit -m "Initial commit from Create Next App"', {
+      stdio: 'ignore',
+    });
+    return true;
+  } catch (e) {
+    if (didInit) {
+      try {
+        rimraf.sync(path.join(root, '.git'));
+      } catch (_) {}
+    }
+    return false;
+  }
+}
+function isInGitRepository(): boolean {
+  try {
+    execSync('git rev-parse --is-inside-work-tree', { stdio: 'ignore' });
+    return true;
+  } catch (_) {}
+  return false;
+}
+
+function isInMercurialRepository(): boolean {
+  try {
+    execSync('hg --cwd . root', { stdio: 'ignore' });
+    return true;
+  } catch (_) {}
+  return false;
 }
 
 run()
