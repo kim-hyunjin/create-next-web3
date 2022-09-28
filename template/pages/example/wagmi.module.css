@@ -1,0 +1,52 @@
+.container {
+  width: 100%;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 2rem;
+}
+.container button {
+  padding: 1rem;
+  border: 2px solid transparent;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+.container button:hover {
+  border: 2px solid aquamarine;
+}
+
+.connectors {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.errMsg {
+  color: rgb(246, 132, 132);
+  font-weight: 600;
+}
+
+.account {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.address {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.network {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.chains {
+  display: flex;
+  gap: 1rem;
+}
