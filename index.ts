@@ -522,13 +522,13 @@ async function notifyUpdate(): Promise<void> {
     if (res?.latest) {
       const pkgManager = getPkgManager();
       console.log(
-        chalk.yellow.bold('A new version of `create-next-app` is available!') +
+        chalk.yellow.bold('A new version of `create-next-web3` is available!') +
           '\n' +
           'You can update by running: ' +
           chalk.cyan(
             pkgManager === 'yarn'
-              ? 'yarn global add create-next-app'
-              : `${pkgManager} install --global create-next-app`
+              ? 'yarn global add create-next-web3'
+              : `${pkgManager} install --global create-next-web3`
           ) +
           '\n'
       );
