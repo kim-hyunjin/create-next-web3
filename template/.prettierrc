@@ -1,0 +1,14 @@
+{
+  "singleQuote": true,
+  "importOrder": [
+    "react",
+    "next",
+    "next/(.*)$",
+    "<THIRD_PARTY_MODULES>",
+    "^@/ui/(.*)$",
+    "^../(.*)$",
+    "^./(.*)$"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
+}
