@@ -224,7 +224,7 @@ async function copyTemplate(root: string) {
       switch (name) {
         case 'gitignore':
         case 'eslintrc.json':
-        case 'prettierrc.js': {
+        case 'prettierrc': {
           return '.'.concat(name);
         }
         // README.md is ignored by webpack-asset-relocator-loader used by ncc:
