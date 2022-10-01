@@ -12,7 +12,7 @@
     "dev": "ncc build ./index.ts -w -o dist/",
     "prerelease": "rimraf ./dist/",
     "release": "ncc build ./index.ts -o ./dist/ --minify --no-cache --no-source-map-register",
-    "build": "yarn release"
+    "build": "pnpm release"
   },
   "repository": {
     "type": "git",
