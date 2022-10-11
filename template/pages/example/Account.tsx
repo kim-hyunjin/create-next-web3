@@ -1,7 +1,8 @@
 import Image from 'next/image';
-import { useAccount, useDisconnect, useEnsAvatar, useEnsName } from 'wagmi';
-import Balance from './Balance';
 
+import { useAccount, useDisconnect, useEnsAvatar, useEnsName } from 'wagmi';
+
+import Balance from './Balance';
 import styles from './wagmi.module.css';
 
 export default function Account() {

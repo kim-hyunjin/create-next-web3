@@ -1,8 +1,9 @@
 import { Suspense } from 'react';
+
 import dynamic from 'next/dynamic';
 
-import styles from './wagmi.module.css';
 import BlockNumber from './BlockNumber';
+import styles from './wagmi.module.css';
 
 const Connect = dynamic(() => import('./Connect'), { ssr: false });
 const Account = dynamic(() => import('./Account'), { ssr: false });
