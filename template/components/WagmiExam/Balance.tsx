@@ -1,12 +1,12 @@
 import { useBalance } from 'wagmi';
 
 export default function Balance({
-  addressOrName,
+  address,
 }: {
-  addressOrName: string | undefined;
+  address: `0x${string}` | undefined;
 }) {
   const { data, isError, isLoading } = useBalance({
-    addressOrName,
+    address,
   });
 
   if (isLoading) return <div>Fetching balance…</div>;

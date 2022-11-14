@@ -7,7 +7,7 @@ import styles from './wagmi.module.css';
 
 export default function Account() {
   const { connector, isConnected, address } = useAccount();
-  const { data: ensAvatar } = useEnsAvatar({ addressOrName: address });
+  const { data: ensAvatar } = useEnsAvatar({ address });
   const { data: ensName } = useEnsName({ address });
   const { disconnect } = useDisconnect();
 
@@ -25,7 +25,7 @@ export default function Account() {
             />
             <div>{ensName ? `${ensName} (${address})` : address}</div>
           </div>
-          <Balance addressOrName={address} />
+          <Balance address={address} />
           <div>Connected to {connector?.name}</div>
           <button onClick={() => disconnect()}>Disconnect</button>
         </div>
