@@ -1,6 +1,6 @@
 # Create Next Web3
 
-This CLI tool enables you to quickly start building a new Next.js application, with ethers, wagmi, typescript, typechain, prettier settings.
+This CLI tool enables you to quickly start building a new Next.js application, with ethers, wagmi, typescript,  prettier settings.
 
 ```bash
 npx create-next-web3
