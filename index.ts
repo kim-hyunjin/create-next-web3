@@ -142,8 +142,6 @@ function writePackageJson(root: string, appName: string) {
       build: 'next build',
       start: 'next start',
       lint: 'next lint',
-      // postinstall: 'yarn run typechain',
-      typechain: 'typechain --out-dir abi/types --target=ethers-v5 "abi/*.json"',
     },
   };
 
@@ -179,8 +177,6 @@ async function installDep(root: string) {
     'typescript',
     'prettier',
     '@trivago/prettier-plugin-sort-imports',
-    'typechain',
-    '@typechain/ethers-v5',
   ];
 
   /**

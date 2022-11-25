@@ -1,6 +1,6 @@
 {
   "name": "create-next-web3",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "nextjs + typescript + prettier config + wagmi",
   "bin": {
     "create-next-web3": "./dist/index.js"
