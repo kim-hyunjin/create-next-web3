@@ -1,7 +1,7 @@
 {
   "name": "create-next-web3",
-  "version": "0.0.8",
-  "description": "nextjs + typescript + prettier config + wagmi",
+  "version": "0.0.9",
+  "description": "nextjs + typescript + wagmi + prettier",
   "bin": {
     "create-next-web3": "./dist/index.js"
   },
@@ -26,7 +26,7 @@
     "wagmi"
   ],
   "author": "kim-hyunjin",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/kim-hyunjin/web3-nextjs-template/issues"
   },
